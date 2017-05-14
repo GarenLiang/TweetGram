@@ -7,13 +7,23 @@
 //
 
 import Cocoa
+import OAuthSwift
 
 class ViewController: NSViewController {
+    
+    let oauthswift = OAuth1Swift(
+        consumerKey:    "",
+        consumerSecret: "",
+        requestTokenUrl: "https://api.twitter.com/oauth/request_token",
+        authorizeUrl:    "https://api.twitter.com/oauth/authorize",
+        accessTokenUrl:  "https://api.twitter.com/oauth/access_token"
+    )
 
     override func viewDidLoad() {
         super.viewDidLoad()
 
         // Do any additional setup after loading the view.
+        login()
     }
 
     override var representedObject: Any? {
@@ -21,7 +31,21 @@ class ViewController: NSViewController {
         // Update the view, if already loaded.
         }
     }
-
+    
+    func login() {
+        
+        let handle = oauthswift.authorize(
+            withCallbackURL: URL(string: "TweetGram://wemadeit")!,
+            success: { credential, response, parameters in
+                print(credential.oauthToken)
+                print(credential.oauthTokenSecret)
+                print(parameters["user_id"])
+        },
+            failure: { error in
+                print(error.localizedDescription)
+        }             
+        )
+    }
 
 }
 
