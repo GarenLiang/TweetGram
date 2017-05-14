@@ -34,16 +34,29 @@ class ViewController: NSViewController {
     
     func login() {
         
-        let handle = oauthswift.authorize(
+        let _ = oauthswift.authorize(
             withCallbackURL: URL(string: "TweetGram://wemadeit")!,
             success: { credential, response, parameters in
                 print(credential.oauthToken)
                 print(credential.oauthTokenSecret)
-                print(parameters["user_id"])
+                self.getFollowers()
         },
             failure: { error in
                 print(error.localizedDescription)
         }             
+        )
+    }
+    
+    func getFollowers() {
+        let _ = oauthswift.client.get("https://api.twitter.com/1.1/statuses/home_timeline.json",
+                              success: { response in
+                                if let dataString = response.string {
+                                print(dataString)
+                                }
+        },
+                              failure: { error in
+                                print(error)
+        }
         )
     }
 
