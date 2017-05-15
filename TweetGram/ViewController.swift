@@ -11,6 +11,7 @@ import OAuthSwift
 import SwiftyJSON
 class ViewController: NSViewController {
     
+    @IBOutlet weak var loginlogoutButton: NSButton!
     let oauthswift = OAuth1Swift(
         consumerKey:    "",
         consumerSecret: "",
@@ -23,15 +24,28 @@ class ViewController: NSViewController {
         super.viewDidLoad()
 
         // Do any additional setup after loading the view.
-        login()
+        //login()
+        checkLogin()
     }
 
-    override var representedObject: Any? {
-        didSet {
-        // Update the view, if already loaded.
+//    override var representedObject: Any? {
+//        didSet {
+//        // Update the view, if already loaded.
+//        }
+//    }
+    func checkLogin() {
+        if let oauthToken = UserDefaults.standard.string(forKey: "oauthToken") {
+            if let oauthTokenSecret = UserDefaults.standard.string(forKey: "oauthTokenSecret") {
+                oauthswift.client.credential.oauthToken = oauthToken
+                oauthswift.client.credential.oauthTokenSecret = oauthTokenSecret
+                
+                getTweets()
+            }
         }
     }
-    
+    @IBAction func loginlogoutClicked(_ sender: Any) {
+        login()
+    }
     func login() {
         
         let _ = oauthswift.authorize(
@@ -39,7 +53,10 @@ class ViewController: NSViewController {
             success: { credential, response, parameters in
                 //print(credential.oauthToken)
                 //print(credential.oauthTokenSecret)
-                self.getFollowers()
+                UserDefaults.standard.set(credential.oauthToken, forKey: "oauthToken")
+                UserDefaults.standard.set(credential.oauthTokenSecret, forKey: "oauthTokenSecret")
+                UserDefaults.standard.synchronize()
+                self.getTweets()
         },
             failure: { error in
                 print(error.localizedDescription)
@@ -47,7 +64,7 @@ class ViewController: NSViewController {
         )
     }
     
-    func getFollowers() {
+    func getTweets() {
         let _ = oauthswift.client.get("https://api.twitter.com/1.1/statuses/home_timeline.json",
                                       parameters: ["tweet_mode": "extended"],
                               success: { response in
