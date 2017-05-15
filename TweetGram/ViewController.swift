@@ -8,7 +8,7 @@
 
 import Cocoa
 import OAuthSwift
-
+import SwiftyJSON
 class ViewController: NSViewController {
     
     let oauthswift = OAuth1Swift(
@@ -37,8 +37,8 @@ class ViewController: NSViewController {
         let _ = oauthswift.authorize(
             withCallbackURL: URL(string: "TweetGram://wemadeit")!,
             success: { credential, response, parameters in
-                print(credential.oauthToken)
-                print(credential.oauthTokenSecret)
+                //print(credential.oauthToken)
+                //print(credential.oauthTokenSecret)
                 self.getFollowers()
         },
             failure: { error in
@@ -49,11 +49,26 @@ class ViewController: NSViewController {
     
     func getFollowers() {
         let _ = oauthswift.client.get("https://api.twitter.com/1.1/statuses/home_timeline.json",
+                                      parameters: ["tweet_mode": "extended"],
                               success: { response in
-                                if let dataString = response.string {
-                                print(dataString)
+//                                if let dataString = response.string {
+//                                print(dataString)
+//                                }
+                                
+                                let json = JSON(data: response.data)
+                                var imageURLs : [String] = []
+                                
+                                for (_,tweetJson):(String, JSON) in json {
+                                    for (_,mediaJson):(String, JSON) in
+                                        tweetJson["entities"]["media"] {
+                                            if let url = mediaJson["media_url_https"].string
+                                            {
+                                                imageURLs.append(url)
+                                            }
+                                    }
                                 }
-        },
+                                print(imageURLs)
+         },
                               failure: { error in
                                 print(error)
         }

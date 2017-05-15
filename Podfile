@@ -9,4 +9,5 @@ target 'TweetGram' do
 
   # Pods for TweetGram
   pod 'OAuthSwift', '~> 1.1.0'
+  pod 'SwiftyJSON', '~> 3.1'
 end
