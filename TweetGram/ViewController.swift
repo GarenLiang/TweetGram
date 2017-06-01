@@ -40,11 +40,23 @@ class ViewController: NSViewController {
                 oauthswift.client.credential.oauthTokenSecret = oauthTokenSecret
                 
                 getTweets()
+                loginlogoutButton.title = "Logout"
             }
         }
     }
     @IBAction func loginlogoutClicked(_ sender: Any) {
-        login()
+        if loginlogoutButton.title == "Login" {
+            login()
+        } else {
+            logout()
+        }
+    }
+    
+    func logout() {
+        loginlogoutButton.title = "Login"
+        UserDefaults.standard.removeObject(forKey: "oauthToken")
+        UserDefaults.standard.removeObject(forKey: "oauthTokenSecret")
+        UserDefaults.standard.synchronize()
     }
     func login() {
         
@@ -56,6 +68,8 @@ class ViewController: NSViewController {
                 UserDefaults.standard.set(credential.oauthToken, forKey: "oauthToken")
                 UserDefaults.standard.set(credential.oauthTokenSecret, forKey: "oauthTokenSecret")
                 UserDefaults.standard.synchronize()
+                
+                self.loginlogoutButton.title = "Logout"
                 self.getTweets()
         },
             failure: { error in
